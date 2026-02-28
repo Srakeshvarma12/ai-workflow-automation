@@ -3,14 +3,16 @@ from app.services.gemini_service import classify_input
 from app.services.rabbitmq_service import publish_task
 import uuid
 
+from typing import Optional, Dict, Any
+
 @task(retries=3, retry_delay_seconds=10, name="AI Processing")
-async def ai_process_task(input_text: str) -> dict:
+async def ai_process_task(input_text: str) -> Dict[str, Any]:
     """Process input with Gemini AI."""
     result = await classify_input(input_text)
     return result
 
 @task(name="Queue Action")
-async def queue_action_task(ai_result: dict, workflow_id: str):
+async def queue_action_task(ai_result: Dict[str, Any], workflow_id: str):
     """Send result to RabbitMQ for further processing."""
     await publish_task("workflow_results", {
         "workflow_id": workflow_id,
@@ -18,12 +20,10 @@ async def queue_action_task(ai_result: dict, workflow_id: str):
     })
 
 @task(name="Log Result")
-async def log_result_task(workflow_id: str, result: dict):
+async def log_result_task(workflow_id: str, result: Dict[str, Any]):
     """Log the workflow result."""
     print(f"Workflow {workflow_id} completed: {result}")
     return True
-
-from typing import Optional
 
 @flow(name="main-ai-workflow", log_prints=True)
 async def main_workflow(input_text: str, workflow_id: Optional[str] = None):
