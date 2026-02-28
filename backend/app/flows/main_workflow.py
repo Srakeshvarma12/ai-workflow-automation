@@ -23,8 +23,10 @@ async def log_result_task(workflow_id: str, result: dict):
     print(f"Workflow {workflow_id} completed: {result}")
     return True
 
+from typing import Optional
+
 @flow(name="main-ai-workflow", log_prints=True)
-async def main_workflow(input_text: str, workflow_id: str = None):
+async def main_workflow(input_text: str, workflow_id: Optional[str] = None):
     """Main workflow: Input → AI → Queue → Log."""
     if not workflow_id:
         workflow_id = str(uuid.uuid4())
