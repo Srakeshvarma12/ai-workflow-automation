@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
@@ -19,6 +20,9 @@ class Settings(BaseSettings):
     PREFECT_API_KEY: str = ""
     PREFECT_API_URL: str = ""
 
-    model_config = {"env_file": ".env", "extra": "ignore"}
+    # Render specific
+    PYTHON_VERSION: Optional[str] = None
+
+    model_config = {"env_file": ".env"}
 
 settings = Settings()
